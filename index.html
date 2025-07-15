@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alteryx Workflow Documentation</title>
+    <link rel="stylesheet" href="styls.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-project-diagram"></i>
+                    <div class="logo-text">
+                        <h1>Alteryx Workflow Documentation</h1>
+                        <p>Extract and analyze workflow configurations</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button id="exportBtn" class="btn btn-outline" disabled>
+                        <i class="fas fa-download"></i>
+                        Export XML
+                    </button>
+                    <button id="exportDocBtn" class="btn btn-primary" disabled>
+                        <i class="fas fa-file-alt"></i>
+                        Export Documentation
+                    </button>
+                    <button id="clearBtn" class="btn btn-secondary">
+                        <i class="fas fa-trash"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Sidebar -->
+            <aside class="sidebar">
+                <!-- File Upload -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Upload Workflow</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="upload-zone" id="uploadZone">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <p class="upload-text">Drop files here or click to browse</p>
+                            <p class="upload-subtext">Supports .yxmd, .yxmc, .yxwz files</p>
+                            <input type="file" id="fileInput" accept=".yxmd,.yxmc,.yxwz" multiple hidden>
+                        </div>
+                        
+                        <div class="selected-files" id="selectedFiles"></div>
+                        
+                        <div class="upload-progress" id="uploadProgress" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">0%</div>
+                        </div>
+                        
+                        <button id="uploadBtn" class="btn btn-primary" disabled>
+                            <i class="fas fa-upload"></i>
+                            Upload Files
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Files -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Recent Files</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="recent-files" id="recentFiles">
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <p>No files uploaded yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workflow Structure -->
+                <div class="card" id="workflowStructure" style="display: none;">
+                    <div class="card-header">
+                        <h3>Workflow Structure</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="structure-tree" id="structureTree"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Workflow Explanation -->
+                <div class="card" id="explanationCard" style="display: none;">
+                    <div class="card-header">
+                        <h3>Workflow Explanation</h3>
+                        <div class="header-actions">
+                            <button id="copyExplanationBtn" class="btn btn-ghost">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="explanation-content">
+                            <div class="explanation-summary">
+                                <h4>Summary</h4>
+                                <p id="explanationSummary"></p>
+                            </div>
+                            
+                            <div class="explanation-details">
+                                <div class="explanation-section">
+                                    <h4>Input Sources</h4>
+                                    <div id="inputTools" class="tool-list"></div>
+                                </div>
+                                
+                                <div class="explanation-section">
+                                    <h4>Data Processing</h4>
+                                    <div id="processingTools" class="tool-list"></div>
+                                </div>
+                                
+                                <div class="explanation-section">
+                                    <h4>Output Destinations</h4>
+                                    <div id="outputTools" class="tool-list"></div>
+                                </div>
+                                
+                                <div class="explanation-section">
+                                    <h4>Data Flow</h4>
+                                    <div id="dataFlow" class="data-flow-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="card" id="searchCard" style="display: none;">
+                    <div class="card-content">
+                        <div class="search-controls">
+                            <div class="search-input">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchInput" placeholder="Search XML content...">
+                            </div>
+                            <div class="filter-controls">
+                                <select id="toolFilter">
+                                    <option value="all">All Tools</option>
+                                </select>
+                                <button class="btn btn-outline">
+                                    <i class="fas fa-filter"></i>
+                                    Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="card" id="statusCard" style="display: none;">
+                    <div class="card-content">
+                        <div class="status-bar">
+                            <div class="status-info">
+                                <div class="status-indicator">
+                                    <div class="status-dot success"></div>
+                                    <span>Parsed Successfully</span>
+                                </div>
+                                <div class="file-info" id="fileInfo"></div>
+                            </div>
+                            <div class="view-controls">
+                                <span>View:</span>
+                                <div class="view-tabs">
+                                    <button class="view-tab active" data-view="explanation">Explanation</button>
+                                    <button class="view-tab" data-view="xml">XML</button>
+                                    <button class="view-tab" data-view="visual">Visual</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- XML Viewer -->
+                <div class="card" id="xmlViewer" style="display: none;">
+                    <div class="card-header">
+                        <h3>XML Content</h3>
+                        <div class="header-actions">
+                            <button id="expandBtn" class="btn btn-ghost">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button id="copyBtn" class="btn btn-ghost">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="xml-content" id="xmlContent"></div>
+                    </div>
+                </div>
+
+                <!-- Tool Details -->
+                <div class="card" id="toolDetails" style="display: none;">
+                    <div class="card-header">
+                        <h3>Tool Configuration Details</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="tool-info" id="toolInfo"></div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="card" id="statisticsCard" style="display: none;">
+                    <div class="card-header">
+                        <h3>Workflow Statistics</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-grid" id="statsGrid"></div>
+                        <div class="tool-breakdown" id="toolBreakdown"></div>
+                    </div>
+                </div>
+
+                <!-- Workflow Visualization -->
+                <div class="card" id="workflowVisualization" style="display: none;">
+                    <div class="card-header">
+                        <h3>Workflow Visualization</h3>
+                        <div class="header-actions">
+                            <button id="downloadVisualBtn" class="btn btn-outline">
+                                <i class="fas fa-download"></i>
+                                Download
+                            </button>
+                            <button id="zoomInBtn" class="btn btn-ghost">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button id="zoomOutBtn" class="btn btn-ghost">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button id="resetZoomBtn" class="btn btn-ghost">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="visualization-container">
+                            <div id="workflowDiagram" class="mermaid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state-main" id="emptyState">
+                    <i class="fas fa-project-diagram"></i>
+                    <h3>No workflow selected</h3>
+                    <p>Upload a workflow file or select one from the recent files to get started.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
