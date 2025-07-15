@@ -1,0 +1,47 @@
+┌────────────────────┐
+│     User UI        │
+│ (Web Frontend App) │
+└────────┬───────────┘
+         │ Upload .yxmd/.yxmc/.yxzp file or paste XML
+         ▼
+┌────────────────────┐
+│ File Handling/      │
+│ XML Reader Module   │
+│ (Extract & Validate)│
+└────────┬───────────┘
+         │
+         ▼
+┌────────────────────┐
+│    XML Parser       │
+│ (Extract tools,     │
+│  connections,       │
+│  annotations, etc.) │
+└────────┬───────────┘
+         │
+         ▼
+┌────────────────────┐
+│ Workflow Analyzer   │
+│ (Map Tool Types,    │
+│ Logic, Dependencies)│
+└────────┬───────────┘
+         │
+         ▼
+┌────────────────────┐
+│ Documentation       │
+│ Generator           │
+│ (Plain Text / HTML /│
+│ Markdown Structuring│
+└────────┬───────────┘
+         │
+         ▼
+┌────────────────────┐
+│ Export Module       │
+│ (PDF / HTML / MD)   │
+└────────┬───────────┘
+         │
+         ▼
+┌────────────────────┐
+│ (Optional) Viewer   │
+│  with Flow Diagram  │
+│ (D3.js or Mermaid)  │
+└────────────────────┘

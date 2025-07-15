@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Alteryx Workflow Analyzer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <!-- Add Marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="header">
+    <span class="logo">🧩 AlteryxDoc</span>
+    <div class="subtitle">Workflow Documentation Generator</div>
+  </div>
+  
+  <!-- Connection Status -->
+  <div id="connectionStatus" class="connection-status">
+    Checking backend connection...
+  </div>
+
+  <div class="container">
+    <h1>Import Alteryx Workflow</h1>
+    <p>Upload your Alteryx workflow file to generate comprehensive documentation. Supported format: <b>.yxmd</b></p>
+    <form id="importForm">
+      <label class="upload-area" id="uploadArea">
+        <div class="upload-icon">📂</div>
+        <div>Click or drag file here to upload</div>
+        <input type="file" id="workflowFile" accept=".yxmd" />
+        <div class="file-name" id="fileName"></div>
+      </label>
+      <div class="actions">
+        <button type="button" class="btn secondary" id="resetBtn">Reset</button>
+        <button type="submit" class="btn" id="importBtn" disabled>Generate Documentation</button>
+      </div>
+      <div class="status-message" id="statusMsg"></div>
+    </form>
+  </div>
+
+  <!-- Documentation output section -->
+  <div class="workflow-output" id="workflowOutput" style="display: none;">
+    <div class="container">
+      <div class="documentation-header">
+        <h2>Workflow Documentation</h2>
+        <div class="action-buttons">
+            <button id="downloadBtn" class="btn secondary">
+                <span class="download-icon">📥</span> Download Documentation
+            </button>
+            <button id="downloadXmlBtn" class="btn secondary">
+                <span class="download-icon">📥</span> Download XML
+            </button>
+            <button id="downloadXmlPdfBtn" class="btn secondary">
+                <span class="download-icon">📥</span> Download XML as PDF
+            </button>
+        </div>
+      </div>
+      
+      <!-- Documentation content -->
+      <div class="documentation-content" id="docContent"></div>
+
+      <!-- Tools section -->
+      <div class="tools-section">
+        <h3>Tools Overview</h3>
+        <div class="tools-grid" id="toolsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    &copy; 2024 AlteryxDoc. All rights reserved.
+  </div>
+
+  <script>
+    // Backend configuration
+    const BACKEND_URL = 'http://localhost:5507';
+    
+    // DOM Elements
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('workflowFile');
+    const fileName = document.getElementById('fileName');
+    const importBtn = document.getElementById('importBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const workflowOutput = document.getElementById('workflowOutput');
+    const toolsList = document.getElementById('toolsList');
+    const docContent = document.getElementById('docContent');
+    const connectionStatus = document.getElementById('connectionStatus');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const downloadXmlBtn = document.getElementById('downloadXmlBtn');
+    const downloadXmlPdfBtn = document.getElementById('downloadXmlPdfBtn');
+    let selectedFile = null;
+    let backendConnected = false;
+    let currentDocumentation = null;
+
+    // Test backend connection
+    async function testBackendConnection() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/test`);
+        const data = await response.json();
+        if (response.ok) {
+          connectionStatus.textContent = '✅ Backend connected';
+          connectionStatus.className = 'connection-status connected';
+          backendConnected = true;
+          return true;
+        }
+      } catch (err) {
+        console.error('Backend connection error:', err);
+      }
+      connectionStatus.textContent = '❌ Backend not connected. Please ensure the server is running.';
+      connectionStatus.className = 'connection-status error';
+      backendConnected = false;
+      return false;
+    }
+
+    // Test connection on page load
+    testBackendConnection();
+    // Retry connection every 5 seconds if failed
+    setInterval(() => {
+      if (!backendConnected) {
+        testBackendConnection();
+      }
+    }, 5000);
+
+    // Drag & drop handlers
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileChange();
+      }
+    });
+
+    // File selection handlers
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', handleFileChange);
+
+    function handleFileChange() {
+      if (fileInput.files.length) {
+        selectedFile = fileInput.files[0];
+        fileName.textContent = selectedFile.name;
+        importBtn.disabled = !backendConnected;
+        statusMsg.textContent = '';
+        workflowOutput.style.display = 'none';
+      } else {
+        selectedFile = null;
+        fileName.textContent = '';
+        importBtn.disabled = true;
+      }
+    }
+
+    // Reset handler
+    resetBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      fileName.textContent = '';
+      importBtn.disabled = true;
+      statusMsg.textContent = '';
+      selectedFile = null;
+      workflowOutput.style.display = 'none';
+      currentDocumentation = null;
+    });
+
+    // Download handler
+    downloadBtn.addEventListener('click', () => {
+      if (!currentDocumentation) return;
+      
+      const blob = new Blob([currentDocumentation], { type: 'text/markdown' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const filename = selectedFile ? 
+        `${selectedFile.name.replace('.yxmd', '')}-documentation.md` : 
+        'workflow-documentation.md';
+      
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
+
+    // Form submission handler
+    document.getElementById('importForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!selectedFile || !backendConnected) return;
+      
+      importBtn.disabled = true;
+      statusMsg.textContent = 'Generating documentation...';
+      statusMsg.className = 'status-message';
+      workflowOutput.style.display = 'none';
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+          statusMsg.textContent = 'Documentation generated successfully!';
+          statusMsg.className = 'status-message status-success';
+          
+          // Store and display documentation
+          currentDocumentation = result.documentation;
+          workflowOutput.style.display = 'block';
+          docContent.innerHTML = marked.parse(result.documentation);
+          
+          // Scroll to documentation
+          workflowOutput.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          statusMsg.textContent = result.error || 'Failed to generate documentation.';
+          statusMsg.className = 'status-message status-error';
+        }
+      } catch (err) {
+        console.error('Upload error:', err);
+        statusMsg.textContent = 'Error processing workflow. Please check the console for details.';
+        statusMsg.className = 'status-message status-error';
+      }
+      
+      importBtn.disabled = !backendConnected;
+    });
+
+    downloadXmlPdfBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch(`${BACKEND_URL}/download-xml-pdf`);
+            if (!response.ok) {
+                throw new Error('Failed to generate PDF');
+            }
+            
+            // Create blob from PDF content
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            
+            // Create temporary link and trigger download
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = selectedFile ? 
+                `${selectedFile.name.replace('.yxmd', '')}-workflow.pdf` : 
+                'workflow.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Error downloading PDF:', err);
+            alert('Failed to download PDF. Please try again.');
+        }
+    });
+  </script>
+</body>
+</html>

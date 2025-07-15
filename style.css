@@ -1,0 +1,263 @@
+/* Base styles */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --background-color: #f8f9fa;
+  --border-color: #dee2e6;
+  --text-color: #212529;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+  line-height: 1.6;
+  background-color: var(--background-color);
+}
+
+/* Header styles */
+.header {
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.subtitle {
+  color: var(--secondary-color);
+  margin-top: 0.5rem;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Connection status */
+.connection-status {
+  text-align: center;
+  padding: 0.5rem;
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.connection-status.connected {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.connection-status.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Upload area */
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover, .upload-area.dragover {
+  border-color: var(--primary-color);
+  background-color: rgba(0,123,255,0.05);
+}
+
+.upload-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.file-name {
+  margin-top: 1rem;
+  color: var(--secondary-color);
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn:not(.secondary) {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn.secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+/* Status message */
+.status-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.status-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Documentation output */
+.workflow-output {
+  margin-top: 3rem;
+}
+
+.documentation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.documentation-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+/* Markdown content styling */
+.documentation-content h1 {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.documentation-content h2 {
+  color: var(--text-color);
+  margin-top: 2rem;
+}
+
+.documentation-content h3 {
+  color: var(--secondary-color);
+  margin-top: 1.5rem;
+}
+
+.documentation-content code {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  display: block;
+  margin: 1rem 0;
+  white-space: pre-wrap;
+}
+
+.documentation-content ul {
+  padding-left: 1.5rem;
+}
+
+/* Tools grid */
+.tools-section {
+  margin-top: 2rem;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tool-card {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tool-card h4 {
+  color: var(--primary-color);
+  margin-top: 0;
+}
+
+/* Download button */
+.download-icon {
+  margin-right: 0.5rem;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--secondary-color);
+  border-top: 1px solid var(--border-color);
+  margin-top: 3rem;
+}
+
+/* Hide file input */
+input[type="file"] {
+  display: none;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn.secondary {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.download-icon {
+    font-size: 16px;
+}
